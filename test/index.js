@@ -31,11 +31,13 @@ process.argv.forEach((string) => {
 
     for (let i = 0; i < TEST_PAGES.length; i += 1) {
       const report = await lighthouse(`${ENV}${TEST_PAGES[i].link}`, {
-        port: new URL(browser.wsEndpoint()).port,
+        port: (new URL(browser.wsEndpoint())).port,
         output: 'json',
         logLevel: 'info',
-        disableDeviceEmulation: true,
-        chromeFlags: ['--disable-mobile-emulation'],
+        emulatedFormFactor: 'desktop',
+        throttlingMethod: 'provided',
+        // disableDeviceEmulation: true,
+        chromeFlags: ['--disable-device-emulation=true', '--emulated-form-factor="desktop"']
       });
       const json = reportGenerator.generateReport(report.lhr, 'json');
       const html = reportGenerator.generateReport(report.lhr, 'html');
@@ -74,7 +76,7 @@ process.argv.forEach((string) => {
       .setData(records) // see above json data section
       .render();
 
-    fs.writeFileSync(`reports/lighthouse-report-index.html`, table);
+    fs.writeFileSync(`reports/index.html`, table);
 
     console.log('Done!');
   } catch (error) {
